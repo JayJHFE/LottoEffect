@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경품 추첨 로또</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 영상 오버레이 -->
+    <div class="video-overlay" id="videoOverlay">
+        <video id="drawVideo" preload="auto">
+            <source src="lotto_video.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- 빛 효과 오버레이 -->
+    <div class="light-effect" id="lightEffect">
+        <div class="starburst">
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+        </div>
+        <div class="center-glow"></div>
+        <div class="light-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>경품 추첨 로또</h1>
+        
+        <div class="lottery-container">
+            <div class="machine-container">
+                <div class="machine-top">추첨기</div>
+                <canvas id="canvas"></canvas>
+                <div class="tube">
+                    <div class="selected-ball" id="selectedBall"></div>
+                </div>
+            </div>
+
+            <div class="result-message" id="result">추첨 버튼을 눌러주세요!</div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalBalls">8</div>
+                    <div class="stat-label">전체 경품</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="drawCount">0</div>
+                    <div class="stat-label">추첨 횟수</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="drawBtn">추첨하기!</button>
+                <button id="editBtn">경품 편집</button>
+                <button id="resetBtn">리셋</button>
+                <button id="videoBtn">영상 설정</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>경품 목록 편집</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="prize-list" id="prizeList"></div>
+            <button id="addPrizeBtn">+ 경품 추가</button>
+        </div>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>추첨 영상 설정</h3>
+                <button class="close-btn" id="closeVideoModal">&times;</button>
+            </div>
+            <div class="video-setting">
+                <label for="videoUrl">영상 URL:</label>
+                <input type="text" id="videoUrl" placeholder="영상 URL을 입력하세요">
+                <p class="help-text">또는</p>
+                <label for="videoFile">영상 파일 업로드:</label>
+                <input type="file" id="videoFile" accept="video/*">
+                <button id="saveVideoBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
