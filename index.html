@@ -15,33 +15,10 @@
     </div>
 
     <!-- 빛 효과 오버레이 -->
-    <div class="light-effect" id="lightEffect">
-        <div class="starburst">
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-        </div>
-        <div class="center-glow"></div>
-        <div class="light-particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-        </div>
-    </div>
+    <div class="light-effect" id="lightEffect"></div>
+
+    <!-- 당첨 공 표시 (화면 중앙) -->
+    <div class="selected-ball" id="selectedBall"></div>
 
     <div class="container">
         <h1>경품 추첨 로또</h1>
@@ -51,7 +28,6 @@
                 <div class="machine-top">추첨기</div>
                 <canvas id="canvas"></canvas>
                 <div class="tube">
-                    <div class="selected-ball" id="selectedBall"></div>
                 </div>
             </div>
 

@@ -282,6 +282,9 @@ class LotteryMachine {
         // 영상 끝나고 바로 빛 효과 표시
         await this.showLightEffect();
 
+        // 화면 흔들기 시작
+        document.body.classList.add('shake');
+
         // 빛 끝나고 바로 선택된 공 보여주기
         const ballElement = document.getElementById('selectedBall');
         ballElement.style.backgroundColor = selectedBall.color;
@@ -299,6 +302,7 @@ class LotteryMachine {
         
         setTimeout(() => {
             ballElement.classList.remove('show');
+            document.body.classList.remove('shake');
             this.drawing = false;
             if (this.balls.length > 0) {
                 document.getElementById('drawBtn').disabled = false;
@@ -340,7 +344,7 @@ class LotteryMachine {
             setTimeout(() => {
                 lightEffect.classList.remove('show');
                 resolve();
-            }, 1500);
+            }, 2500);
         });
     }
 
