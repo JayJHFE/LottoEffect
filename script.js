@@ -48,14 +48,14 @@ class Ball {
 
         // 텍스트
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 12px Arial';
+        ctx.font = 'bold 10px Arial'; // 폰트 크기를 줄임
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 3;
+        ctx.shadowBlur = 2;
         
         // 텍스트를 여러 줄로 나누기
-        const maxWidth = this.radius * 1.5;
+        const maxWidth = this.radius * 1.6;
         const words = this.label.split(' ');
         let lines = [];
         let currentLine = '';
@@ -74,7 +74,7 @@ class Ball {
 
         // 최대 2줄만 표시
         lines = lines.slice(0, 2);
-        const lineHeight = 14;
+        const lineHeight = 11;
         const startY = this.y - (lines.length - 1) * lineHeight / 2;
 
         lines.forEach((line, i) => {
@@ -146,25 +146,45 @@ class LotteryMachine {
     }
 
     init() {
-        this.resizeCanvas();
         this.loadPrizes();
         this.loadVideoUrl();
+        this.resizeCanvas();
         this.createBalls();
         this.setupEventListeners();
         this.animate();
-        window.addEventListener('resize', () => this.resizeCanvas());
+        window.addEventListener('resize', () => {
+            this.resizeCanvas();
+            this.createBalls();
+        });
     }
 
     resizeCanvas() {
         const container = this.canvas.parentElement;
         this.canvas.width = container.clientWidth;
         this.canvas.height = container.clientHeight;
+        console.log('Canvas resized:', this.canvas.width, 'x', this.canvas.height);
     }
 
     createBalls() {
         this.balls = [];
-        const ballRadius = 30;
-        const padding = 50;
+        
+        // 캔버스 크기가 유효하지 않으면 리사이즈 후 재시도
+        if (this.canvas.width === 0 || this.canvas.height === 0) {
+            console.log('Canvas size is 0, resizing...');
+            this.resizeCanvas();
+        }
+        
+        // 그래도 크기가 0이면 잠시 후 재시도
+        if (this.canvas.width === 0 || this.canvas.height === 0) {
+            console.log('Canvas still 0, retrying in 100ms...');
+            setTimeout(() => this.createBalls(), 100);
+            return;
+        }
+        
+        const ballRadius = 18; // 공 크기를 줄여서 더 많은 공 수용
+        const padding = 30;
+
+        console.log('Creating', this.prizes.length, 'balls...');
 
         this.prizes.forEach((prize, index) => {
             let x, y;
@@ -183,6 +203,7 @@ class LotteryMachine {
             this.balls.push(ball);
         });
 
+        console.log('Balls created:', this.balls.length);
         this.updateStats();
     }
 
@@ -199,6 +220,11 @@ class LotteryMachine {
     }
 
     animate() {
+        if (!this.ctx) {
+            console.error('Canvas context not available');
+            return;
+        }
+        
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // 공들 업데이트 및 그리기
@@ -292,7 +318,7 @@ class LotteryMachine {
         ballElement.classList.add('show');
 
         // 결과 표시
-        document.getElementById('result').textContent = `🎉 당첨: ${selectedBall.label} 🎉`;
+        document.getElementById('result').textContent = `🎉 당첨: ${selectedBall.label} 🎉 (클릭하여 닫기)`;
         
         // 선택된 공 제거
         this.balls.splice(selectedIndex, 1);
@@ -300,16 +326,21 @@ class LotteryMachine {
         this.drawCount++;
         this.updateStats();
         
-        setTimeout(() => {
+        // 클릭하면 공이 사라지도록 이벤트 핸들러 추가
+        const closeHandler = () => {
             ballElement.classList.remove('show');
             document.body.classList.remove('shake');
             this.drawing = false;
             if (this.balls.length > 0) {
                 document.getElementById('drawBtn').disabled = false;
+                document.getElementById('result').textContent = '추첨 버튼을 눌러주세요!';
             } else {
                 document.getElementById('result').textContent = '모든 경품이 소진되었습니다!';
             }
-        }, 3000);
+            ballElement.removeEventListener('click', closeHandler);
+        };
+        
+        ballElement.addEventListener('click', closeHandler);
     }
 
     playVideo() {
@@ -352,11 +383,8 @@ class LotteryMachine {
         document.getElementById('drawBtn').addEventListener('click', () => this.draw());
         document.getElementById('editBtn').addEventListener('click', () => this.openEditModal());
         document.getElementById('resetBtn').addEventListener('click', () => this.reset());
-        document.getElementById('videoBtn').addEventListener('click', () => this.openVideoModal());
         document.getElementById('closeModal').addEventListener('click', () => this.closeEditModal());
-        document.getElementById('closeVideoModal').addEventListener('click', () => this.closeVideoModal());
         document.getElementById('addPrizeBtn').addEventListener('click', () => this.addPrize());
-        document.getElementById('saveVideoBtn').addEventListener('click', () => this.saveVideo());
         
         document.getElementById('editModal').addEventListener('click', (e) => {
             if (e.target.id === 'editModal') {
@@ -364,15 +392,8 @@ class LotteryMachine {
             }
         });
         
-        document.getElementById('videoModal').addEventListener('click', (e) => {
-            if (e.target.id === 'videoModal') {
-                this.closeVideoModal();
-            }
-        });
-        
-        document.getElementById('videoFile').addEventListener('change', (e) => {
-            this.handleVideoFile(e);
-        });
+        // 영상 설정 관련 이벤트는 제거 (버튼이 없으므로)
+        // videoBtn, closeVideoModal, saveVideoBtn, videoFile 관련 이벤트 리스너 제거됨
     }
 
     reset() {
@@ -402,7 +423,7 @@ class LotteryMachine {
             itemDiv.className = 'prize-item';
             itemDiv.innerHTML = `
                 <input type="text" value="${prize}" data-index="${index}">
-                <button onclick="lotteryMachine.removePrize(${index})">삭제</button>
+                <button data-index="${index}">삭제</button>
             `;
             listDiv.appendChild(itemDiv);
         });
@@ -411,6 +432,13 @@ class LotteryMachine {
             input.addEventListener('change', (e) => {
                 const index = parseInt(e.target.dataset.index);
                 this.prizes[index] = e.target.value;
+            });
+        });
+
+        listDiv.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                this.removePrize(index);
             });
         });
     }
@@ -485,6 +513,13 @@ class LotteryMachine {
     }
 }
 
-// 로또 머신 인스턴스 생성
-const lotteryMachine = new LotteryMachine();
+// DOM이 로드된 후 로또 머신 인스턴스 생성
+let lotteryMachine;
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        lotteryMachine = new LotteryMachine();
+    });
+} else {
+    lotteryMachine = new LotteryMachine();
+}
 
